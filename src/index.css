@@ -92,18 +92,28 @@ body {
   height: auto;
 }
 
+.landing-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: auto 0;
+  /* Center vertically in the content area */
+}
+
 .language-selector {
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
 }
 
 .select-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gray);
+  font-size: 28px;
+  /* 2x original 14px */
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 10px;
 }
 
 .dropdown-toggle {

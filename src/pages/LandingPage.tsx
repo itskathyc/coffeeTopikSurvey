@@ -23,7 +23,7 @@ const LandingPage = () => {
     const selectedLangLabel = languages.find(l => l.code === lang)?.label;
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <div className="landing-view">
             <div className="logo-container">
                 <img src="/logo.png" alt="CoffeeTopik Logo" className="logo" />
             </div>
