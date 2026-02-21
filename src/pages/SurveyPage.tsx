@@ -53,6 +53,10 @@ const SurveyPage = () => {
                 </div>
             </div>
 
+            <div className="survey-logo-container">
+                <img src="/logo.png" alt="CoffeeTopik Logo" className="survey-logo" />
+            </div>
+
             <div className="question-card">
                 <h2 className="question-text">{currentQuestion.text[lang]}</h2>
                 <div className="options">

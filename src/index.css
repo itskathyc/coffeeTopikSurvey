@@ -169,7 +169,7 @@ body {
 
 .fixed-bottom-btn:active {
   transform: translateX(-50%) scale(0.98);
-  background: var(--primary-dark);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .question-card {
@@ -177,8 +177,20 @@ body {
   padding: 30px 24px;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  margin-top: 20px;
+  margin: auto 0;
+  /* Centering vertically in the flex container */
   animation: slideIn 0.3s ease-out;
+}
+
+.survey-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.survey-logo {
+  max-width: 140px;
+  height: auto;
 }
 
 @keyframes slideIn {
@@ -218,8 +230,8 @@ body {
 }
 
 .option-btn.selected {
-  border-color: var(--primary);
-  background: #fffdf0;
+  border-color: #000;
+  background: #ffffff;
 }
 
 .progress-container {
@@ -227,15 +239,17 @@ body {
 }
 
 .progress-bar {
-  height: 6px;
+  height: 8px;
+  /* Increased from 6px */
   background: #eee;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--primary);
+  background: #F39A79;
+  /* Updated color */
   transition: width 0.3s ease;
 }
 
