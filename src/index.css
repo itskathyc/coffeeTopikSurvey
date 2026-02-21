@@ -173,12 +173,14 @@ body {
 }
 
 .question-card {
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 30px 24px;
   border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: var(--shadow);
   margin: auto 0;
-  /* Centering vertically in the flex container */
   animation: slideIn 0.3s ease-out;
 }
 
@@ -248,8 +250,7 @@ body {
 
 .progress-fill {
   height: 100%;
-  background: #F39A79;
-  /* Updated color */
+  background: #F6C889;
   transition: width 0.3s ease;
 }
 
