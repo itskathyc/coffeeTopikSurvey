@@ -153,7 +153,7 @@ const AdminResultsPage = () => {
     if (!isAuthorized) {
         return (
             <div className="admin-container" style={{
-                backgroundColor: '#f5f7fa',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
@@ -161,31 +161,38 @@ const AdminResultsPage = () => {
                 padding: '20px'
             }}>
                 <div style={{
-                    backgroundColor: '#fff',
-                    padding: '40px',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    background: 'rgba(255, 255, 255, 0.3)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    padding: '30px 24px',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
                     maxWidth: '400px',
                     width: '100%',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    animation: 'slideIn 0.3s ease-out'
                 }}>
-                    <h2 style={{ marginBottom: '20px', color: '#333' }}>Admin Login</h2>
+                    <h2 style={{ marginBottom: '20px', color: '#fff', fontWeight: 'bold' }}>Admin Login</h2>
                     <div style={{ marginBottom: '20px' }}>
-                        <p style={{ marginBottom: '8px', fontSize: '14px', color: '#666', textAlign: 'left' }}>
+                        <p style={{ marginBottom: '8px', fontSize: '14px', color: 'rgba(255,255,255,0.9)', textAlign: 'left' }}>
                             비밀번호를 입력하세요:
                         </p>
-                        <textarea
+                        <input
+                            type="password"
                             value={passwordInput}
                             onChange={(e) => setPasswordInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                             style={{
                                 width: '100%',
                                 padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid #ddd',
-                                minHeight: '80px',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255,255,255,0.3)',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                color: '#fff',
                                 fontSize: '16px',
                                 outline: 'none',
-                                resize: 'none'
+                                boxSizing: 'border-box'
                             }}
                             placeholder="비밀번호 기입..."
                         />
@@ -195,13 +202,14 @@ const AdminResultsPage = () => {
                         style={{
                             width: '100%',
                             padding: '12px',
-                            backgroundColor: 'var(--primary-color)',
-                            color: '#fff',
+                            backgroundColor: '#fff',
+                            color: '#764ba2',
                             border: 'none',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             cursor: 'pointer',
                             fontSize: '16px',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            transition: 'all 0.2s ease'
                         }}
                     >
                         입장
