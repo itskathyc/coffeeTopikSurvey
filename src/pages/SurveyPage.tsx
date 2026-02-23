@@ -7,6 +7,7 @@ const SurveyPage = () => {
     const [lang, setLang] = useState<Language>('en');
     const [setType, setSetType] = useState<'market' | 'package'>('market');
     const [currentStep, setCurrentStep] = useState(0);
+    const [uid, setUid] = useState<string>('');
     const [answers, setAnswers] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -16,18 +17,48 @@ const SurveyPage = () => {
         // 50:50 random assignment
         const randomSet = Math.random() < 0.5 ? 'market' : 'package';
         setSetType(randomSet);
+
+        // Generate UID
+        const newUid = Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+        setUid(newUid);
     }, []);
 
     const surveySet = SURVEY_DATA[setType];
     const totalSteps = surveySet.questions.length;
     const currentQuestion = surveySet.questions[currentStep];
 
+    const submitResults = async (finalAnswers: Record<string, string>) => {
+        const formData = new FormData();
+        formData.append('form-name', 'survey-results');
+        formData.append('uid', uid);
+        formData.append('type', setType === 'market' ? '[시장검증]' : '[패키지]');
+        formData.append('language', lang);
+
+        Object.keys(finalAnswers).forEach(key => {
+            formData.append(key, finalAnswers[key]);
+        });
+
+        try {
+            await fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams(formData as any).toString(),
+            });
+        } catch (error) {
+            console.error("Survey auto-submission error:", error);
+        }
+    };
+
     const handleNext = () => {
         if (currentStep < totalSteps - 1) {
             setCurrentStep(currentStep + 1);
         } else {
+            // Auto-submit first
+            submitResults(answers);
+
             // Save results to local storage to be used in Thank You page
             localStorage.setItem('surveyResults', JSON.stringify({
+                uid,
                 type: setType === 'market' ? '[시장검증]' : '[패키지]',
                 language: lang,
                 ...answers

@@ -10,7 +10,7 @@ const LandingPage = () => {
     const languages: { code: Language; label: string }[] = [
         { code: 'ko', label: '한국어' },
         { code: 'en', label: 'English' },
-        { code: 'zh', label: 'Hanyu' },
+        { code: 'zh', label: '汉语' },
         { code: 'vi', label: 'Vietnamese' },
         { code: 'id', label: 'Indonesian' },
     ];

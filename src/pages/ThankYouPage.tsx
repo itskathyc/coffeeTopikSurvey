@@ -18,6 +18,7 @@ const ThankYouPage = () => {
         const results = JSON.parse(localStorage.getItem('surveyResults') || '{}');
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
+        formData.append('uid', results.uid);
         formData.append('phoneNumber', phoneNumber);
 
         // Add survey meta data
