@@ -153,7 +153,6 @@ const AdminResultsPage = () => {
     if (!isAuthorized) {
         return (
             <div className="admin-container" style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
@@ -175,9 +174,6 @@ const AdminResultsPage = () => {
                 }}>
                     <h2 style={{ marginBottom: '20px', color: '#fff', fontWeight: 'bold' }}>Admin Login</h2>
                     <div style={{ marginBottom: '20px' }}>
-                        <p style={{ marginBottom: '8px', fontSize: '14px', color: 'rgba(255,255,255,0.9)', textAlign: 'left' }}>
-                            비밀번호를 입력하세요:
-                        </p>
                         <input
                             type="password"
                             value={passwordInput}
@@ -194,7 +190,7 @@ const AdminResultsPage = () => {
                                 outline: 'none',
                                 boxSizing: 'border-box'
                             }}
-                            placeholder="비밀번호 기입..."
+                            placeholder="비밀번호"
                         />
                     </div>
                     <button
@@ -203,7 +199,6 @@ const AdminResultsPage = () => {
                             width: '100%',
                             padding: '12px',
                             backgroundColor: '#fff',
-                            color: '#764ba2',
                             border: 'none',
                             borderRadius: '8px',
                             cursor: 'pointer',
@@ -219,30 +214,29 @@ const AdminResultsPage = () => {
         );
     }
 
-    if (loading) return <div className="admin-container">Loading...</div>;
-    if (error) return <div className="admin-container" style={{ color: 'red' }}>Error: {error}</div>;
+    if (error) return <div className="admin-container" style={{ color: 'red', textAlign: 'center', padding: '40px' }}>Error: {error}</div>;
 
-    const allQuestions = [...SURVEY_DATA.market.questions, ...SURVEY_DATA.package.questions];
-    // Filter questions based on result type for display
     const getQuestionsForType = (type: string) => {
         if (type.includes('시장검증')) return SURVEY_DATA.market.questions;
         return SURVEY_DATA.package.questions;
     };
 
     return (
-        <div className="admin-container" style={{ backgroundColor: '#f5f7fa', minHeight: '100vh', padding: '20px' }}>
+        <div className="admin-results-page">
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                 <div style={{ textAlign: 'center', marginBottom: '30px' }}>
                     <h1 style={{ marginBottom: '10px', color: '#333' }}>응답자수 : {results.length} 명</h1>
                     <button
                         onClick={exportToExcel}
+                        disabled={results.length === 0}
                         style={{
                             padding: '10px 20px',
                             backgroundColor: 'var(--primary-color)',
                             color: '#fff',
                             border: 'none',
                             borderRadius: '6px',
-                            cursor: 'pointer',
+                            cursor: results.length === 0 ? 'not-allowed' : 'pointer',
+                            opacity: results.length === 0 ? 0.6 : 1,
                             fontSize: '14px',
                             fontWeight: 'bold',
                             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -252,36 +246,42 @@ const AdminResultsPage = () => {
                     </button>
                 </div>
 
-                <div className="results-list">
-                    {paginatedResults.map((sub: any) => (
-                        <ResultBox
-                            key={sub.id || sub.uid}
-                            sub={sub}
-                            questions={getQuestionsForType(sub.type)}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>Fetching results...</div>
+                ) : (
+                    <>
+                        <div className="results-list">
+                            {paginatedResults.map((sub: any) => (
+                                <ResultBox
+                                    key={sub.id || sub.uid}
+                                    sub={sub}
+                                    questions={getQuestionsForType(sub.type)}
+                                />
+                            ))}
+                        </div>
 
-                {totalPages > 1 && (
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
-                        <button
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage(prev => prev - 1)}
-                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer' }}
-                        >
-                            Prev
-                        </button>
-                        <span style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-                            Page {currentPage} of {totalPages}
-                        </span>
-                        <button
-                            disabled={currentPage === totalPages}
-                            onClick={() => setCurrentPage(prev => prev + 1)}
-                            style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer' }}
-                        >
-                            Next
-                        </button>
-                    </div>
+                        {totalPages > 1 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
+                                <button
+                                    disabled={currentPage === 1}
+                                    onClick={() => setCurrentPage(prev => prev - 1)}
+                                    style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer' }}
+                                >
+                                    Prev
+                                </button>
+                                <span style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                                <button
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(prev => prev + 1)}
+                                    style={{ padding: '8px 12px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer' }}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
