@@ -38,15 +38,32 @@ const SurveyPage = () => {
         return mapping[l] || l.toUpperCase();
     };
 
+    const convertKorean = (rawAnswers: Record<string, string>) => {
+        const converted: Record<string, string> = {};
+        Object.keys(rawAnswers).forEach(qId => {
+            const question = surveySet.questions.find(q => q.id === qId);
+            if (question) {
+                const optionIndex = question.options[lang].indexOf(rawAnswers[qId]);
+                if (optionIndex !== -1) {
+                    converted[qId] = question.options.ko[optionIndex];
+                } else {
+                    converted[qId] = rawAnswers[qId];
+                }
+            }
+        });
+        return converted;
+    };
+
     const submitResults = async (finalAnswers: Record<string, string>) => {
+        const koreanAnswers = convertKorean(finalAnswers);
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
         formData.append('uid', uid);
         formData.append('type', setType === 'market' ? '[시장검증]' : '[패키지]');
         formData.append('language', getLangCode(lang));
 
-        Object.keys(finalAnswers).forEach(key => {
-            formData.append(key, finalAnswers[key]);
+        Object.keys(koreanAnswers).forEach(key => {
+            formData.append(key, koreanAnswers[key]);
         });
 
         try {
@@ -64,6 +81,7 @@ const SurveyPage = () => {
         if (currentStep < totalSteps - 1) {
             setCurrentStep(currentStep + 1);
         } else {
+            const koreanAnswers = convertKorean(answers);
             // Auto-submit first
             submitResults(answers);
 
@@ -72,19 +90,14 @@ const SurveyPage = () => {
                 uid,
                 type: setType === 'market' ? '[시장검증]' : '[패키지]',
                 language: getLangCode(lang),
-                ...answers
+                ...koreanAnswers
             }));
             navigate('/thankyou');
         }
     };
 
     const handleOptionSelect = (option: string) => {
-        // Find index of selected option in current language
-        const optionIndex = currentQuestion.options[lang].indexOf(option);
-        // Get the corresponding Korean answer text
-        const koreanAnswer = currentQuestion.options.ko[optionIndex];
-
-        setAnswers({ ...answers, [currentQuestion.id]: koreanAnswer });
+        setAnswers({ ...answers, [currentQuestion.id]: option });
     };
 
     const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -110,8 +123,8 @@ const SurveyPage = () => {
                     {currentQuestion.options[lang].map((option, idx) => (
                         <button
                             key={idx}
-                            className={`option-btn ${answers[currentQuestion.id] === currentQuestion.options.ko[idx] ? 'selected' : ''}`}
-                            onClick={() => handleOptionSelect(idx)}
+                            className={`option-btn ${answers[currentQuestion.id] === option ? 'selected' : ''}`}
+                            onClick={() => handleOptionSelect(option)}
                         >
                             {option}
                         </button>
