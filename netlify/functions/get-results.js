@@ -6,10 +6,10 @@ exports.handler = async function (event, context) {
     // const { user } = context.clientContext || {};
     // if (!user) return { statusCode: 401, body: "Unauthorized" };
 
-    const SITE_ID = process.env.SITE_ID;
+    const NETFLIY_SITE_ID = process.env.NETFLIY_SITE_ID;
     const AUTH_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
 
-    if (!SITE_ID || !AUTH_TOKEN) {
+    if (!NETFLIY_SITE_ID || !AUTH_TOKEN) {
         return {
             statusCode: 500,
             body: JSON.stringify({ error: "SITE_ID or NETLIFY_AUTH_TOKEN not set in environment variables" })
@@ -18,7 +18,7 @@ exports.handler = async function (event, context) {
 
     // Simplified: Get all submissions for the site
     try {
-        const response = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/submissions`, {
+        const response = await fetch(`https://api.netlify.com/api/v1/sites/${NETFLIY_SITE_ID}/submissions`, {
             headers: { Authorization: `Bearer ${AUTH_TOKEN}` }
         });
 
