@@ -7,7 +7,7 @@ exports.handler = async function (event, context) {
     // if (!user) return { statusCode: 401, body: "Unauthorized" };
 
     const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID;
-    const AUTH_TOKEN = process.env.AUTH_TOKEN;
+    const AUTH_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
 
     if (!NETLIFY_SITE_ID || !AUTH_TOKEN) {
         return {
