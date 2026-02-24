@@ -27,7 +27,7 @@ const ThankYouPage = () => {
 
         // Add answers
         Object.keys(results).forEach(key => {
-            if (key !== 'type' && key !== 'language') {
+            if (key !== 'type' && key !== 'language' && key !== 'uid') {
                 formData.append(key, results[key]);
             }
         });

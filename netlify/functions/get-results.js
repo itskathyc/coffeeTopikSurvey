@@ -16,23 +16,18 @@ exports.handler = async function (event, context) {
         };
     }
 
-    // 1. Get Form ID first
+    // Simplified: Get all submissions for the site
     try {
-        const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/forms`, {
+        const response = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/submissions`, {
             headers: { Authorization: `Bearer ${AUTH_TOKEN}` }
         });
-        const forms = await formsResponse.json();
-        const surveyForm = forms.find(f => f.name === 'survey-results');
 
-        if (!surveyForm) {
-            return { statusCode: 404, body: JSON.stringify({ error: "Form not found" }) };
+        if (!response.ok) {
+            const errorText = await response.text();
+            return { statusCode: response.status, body: errorText };
         }
 
-        // 2. Get Submissions
-        const submissionsResponse = await fetch(`https://api.netlify.com/api/v1/forms/${surveyForm.id}/submissions`, {
-            headers: { Authorization: `Bearer ${AUTH_TOKEN}` }
-        });
-        const submissions = await submissionsResponse.json();
+        const submissions = await response.json();
 
         return {
             statusCode: 200,

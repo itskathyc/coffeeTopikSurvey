@@ -69,3 +69,6 @@ vite.config.ts.timestamp-*
 
 # OS
 .DS_Store
+
+# Local Netlify folder
+.netlify

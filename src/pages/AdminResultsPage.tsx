@@ -5,8 +5,12 @@ import { SURVEY_DATA } from '../data/surveyData';
 
 const ResultBox = ({ sub, questions }: { sub: any, questions: any[] }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const id = sub.phoneNumber || 'Unknown';
-    const country = sub.language || 'Unknown';
+
+    // Data formatting as requested by user
+    const submissionNumber = sub.number || 'N/A';
+    const type = sub.type || 'Unknown';
+    const language = sub.language || 'Unknown';
+    const isEvent = !!sub.phoneNumber ? 'T' : 'F';
 
     return (
         <div style={{
@@ -29,12 +33,12 @@ const ResultBox = ({ sub, questions }: { sub: any, questions: any[] }) => {
                 }}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{country} / {id}</span>
+                    <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{language} | #{submissionNumber}</span>
                     <span style={{ fontSize: '12px', color: '#999' }}>{new Date(sub.created_at).toLocaleString()}</span>
                 </div>
-                <div style={{ fontSize: '12px', color: '#888' }}>UID: {sub.uid || 'N/A'}</div>
-                <div style={{ fontSize: '14px', color: '#444', marginTop: '4px' }}>
-                    <strong>유형:</strong> {sub.type}
+                <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#888', marginTop: '4px' }}>
+                    <div>Type: {type}</div>
+                    <div>Event: <strong style={{ color: isEvent === 'T' ? 'var(--primary-color)' : '#999' }}>{isEvent}</strong></div>
                 </div>
             </div>
 
@@ -50,6 +54,11 @@ const ResultBox = ({ sub, questions }: { sub: any, questions: any[] }) => {
                             </div>
                         </div>
                     ))}
+                    {sub.phoneNumber && (
+                        <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #eee', fontSize: '14px' }}>
+                            <strong>연락처:</strong> {sub.phoneNumber}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -63,22 +72,7 @@ const AdminResultsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Authentication state
-    const [isAuthorized, setIsAuthorized] = useState(false);
-    const [passwordInput, setPasswordInput] = useState('');
-    const ADMIN_PW = import.meta.env.VITE_ADMIN_PW;
-
-    const handleLogin = () => {
-        if (passwordInput === ADMIN_PW) {
-            setIsAuthorized(true);
-        } else {
-            alert('비밀번호가 일치하지 않습니다.');
-        }
-    };
-
     useEffect(() => {
-        if (!isAuthorized) return;
-
         setLoading(true);
         fetch('/.netlify/functions/get-results')
             .then(res => {
@@ -86,23 +80,34 @@ const AdminResultsPage = () => {
                 return res.json();
             })
             .then(data => {
-                // Deduplicate and merge by UID
+                // Netlify Submissions come as an array of objects with a 'data' property
                 const merged: Record<string, any> = {};
                 data.forEach((item: any) => {
-                    const uid = item.data.uid || item.id;
+                    const submissionData = item.data || {};
+                    const uid = submissionData.uid || item.id;
+
                     if (!merged[uid]) {
-                        merged[uid] = { ...item.data, id: item.id, created_at: item.created_at };
+                        merged[uid] = {
+                            ...submissionData,
+                            id: item.id,
+                            number: item.number,
+                            created_at: item.created_at
+                        };
                     } else {
-                        // Merge phone number and answers if available
-                        merged[uid] = { ...merged[uid], ...item.data };
-                        // Keep the latest timestamp
+                        // Merge fields, prioritizing non-empty values
+                        Object.keys(submissionData).forEach(key => {
+                            if (submissionData[key]) {
+                                merged[uid][key] = submissionData[key];
+                            }
+                        });
+                        // Keep the latest timestamp and largest number
                         if (new Date(item.created_at) > new Date(merged[uid].created_at)) {
                             merged[uid].created_at = item.created_at;
+                            merged[uid].number = item.number;
                         }
                     }
                 });
 
-                // Convert to array and sort by latest first
                 const sorted = Object.values(merged).sort((a, b) =>
                     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                 );
@@ -119,10 +124,11 @@ const AdminResultsPage = () => {
     const exportToExcel = () => {
         const exportData = results.map(res => {
             const row: any = {
-                'ID (Phone)': res.phoneNumber || 'Unknown',
-                'UID': res.uid || 'N/A',
-                'Country/Language': res.language,
+                'No': res.number || 'N/A',
+                'Language': res.language,
                 'Type': res.type,
+                'Event': !!res.phoneNumber ? 'T' : 'F',
+                'Phone': res.phoneNumber || '',
                 'Submitted At': new Date(res.created_at).toLocaleString()
             };
 
@@ -150,74 +156,10 @@ const AdminResultsPage = () => {
 
     const totalPages = Math.ceil(results.length / itemsPerPage);
 
-    if (!isAuthorized) {
-        return (
-            <div className="admin-container" style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '20px'
-            }}>
-                <div style={{
-                    background: 'rgba(255, 255, 255, 0.3)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                    padding: '30px 24px',
-                    borderRadius: '16px',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-                    maxWidth: '400px',
-                    width: '100%',
-                    textAlign: 'center',
-                    animation: 'slideIn 0.3s ease-out'
-                }}>
-                    <h2 style={{ marginBottom: '20px', color: '#fff', fontWeight: 'bold' }}>Admin Login</h2>
-                    <div style={{ marginBottom: '20px' }}>
-                        <input
-                            type="password"
-                            value={passwordInput}
-                            onChange={(e) => setPasswordInput(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255,255,255,0.3)',
-                                backgroundColor: 'rgba(255,255,255,0.2)',
-                                color: '#fff',
-                                fontSize: '16px',
-                                outline: 'none',
-                                boxSizing: 'border-box'
-                            }}
-                            placeholder="비밀번호"
-                        />
-                    </div>
-                    <button
-                        onClick={handleLogin}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            backgroundColor: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        입장
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     if (error) return <div className="admin-container" style={{ color: 'red', textAlign: 'center', padding: '40px' }}>Error: {error}</div>;
 
     const getQuestionsForType = (type: string) => {
-        if (type.includes('시장검증')) return SURVEY_DATA.market.questions;
+        if (type?.includes('시장검증')) return SURVEY_DATA.market.questions;
         return SURVEY_DATA.package.questions;
     };
 

@@ -27,12 +27,23 @@ const SurveyPage = () => {
     const totalSteps = surveySet.questions.length;
     const currentQuestion = surveySet.questions[currentStep];
 
+    const getLangCode = (l: Language) => {
+        const mapping = {
+            ko: 'KR',
+            vi: 'VN',
+            id: 'IND',
+            en: 'ENG',
+            zh: 'CN'
+        };
+        return mapping[l] || l.toUpperCase();
+    };
+
     const submitResults = async (finalAnswers: Record<string, string>) => {
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
         formData.append('uid', uid);
         formData.append('type', setType === 'market' ? '[시장검증]' : '[패키지]');
-        formData.append('language', lang);
+        formData.append('language', getLangCode(lang));
 
         Object.keys(finalAnswers).forEach(key => {
             formData.append(key, finalAnswers[key]);
@@ -60,7 +71,7 @@ const SurveyPage = () => {
             localStorage.setItem('surveyResults', JSON.stringify({
                 uid,
                 type: setType === 'market' ? '[시장검증]' : '[패키지]',
-                language: lang,
+                language: getLangCode(lang),
                 ...answers
             }));
             navigate('/thankyou');
@@ -68,7 +79,12 @@ const SurveyPage = () => {
     };
 
     const handleOptionSelect = (option: string) => {
-        setAnswers({ ...answers, [currentQuestion.id]: option });
+        // Find index of selected option in current language
+        const optionIndex = currentQuestion.options[lang].indexOf(option);
+        // Get the corresponding Korean answer text
+        const koreanAnswer = currentQuestion.options.ko[optionIndex];
+
+        setAnswers({ ...answers, [currentQuestion.id]: koreanAnswer });
     };
 
     const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -94,8 +110,8 @@ const SurveyPage = () => {
                     {currentQuestion.options[lang].map((option, idx) => (
                         <button
                             key={idx}
-                            className={`option-btn ${answers[currentQuestion.id] === option ? 'selected' : ''}`}
-                            onClick={() => handleOptionSelect(option)}
+                            className={`option-btn ${answers[currentQuestion.id] === currentQuestion.options.ko[idx] ? 'selected' : ''}`}
+                            onClick={() => handleOptionSelect(idx)}
                         >
                             {option}
                         </button>
