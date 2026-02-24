@@ -51,6 +51,9 @@ const SurveyPage = () => {
                 }
             }
         });
+
+        console.log(rawAnswers)
+        console.log(converted);
         return converted;
     };
 
