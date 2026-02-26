@@ -133,8 +133,7 @@ const AdminResultsPage = () => {
             };
 
             // Add all questions
-            const allQs = [...SURVEY_DATA.market.questions, ...SURVEY_DATA.package.questions];
-            const uniqueQs = Array.from(new Set(allQs.map(q => q.id))).map(id => allQs.find(q => q.id === id));
+            const uniqueQs = SURVEY_DATA.questions;
 
             uniqueQs.forEach(q => {
                 if (q) row[`Q: ${q.text.ko}`] = res[q.id] || '';
@@ -158,9 +157,8 @@ const AdminResultsPage = () => {
 
     if (error) return <div className="admin-container" style={{ color: 'red', textAlign: 'center', padding: '40px' }}>Error: {error}</div>;
 
-    const getQuestionsForType = (type: string) => {
-        if (type?.includes('시장검증')) return SURVEY_DATA.market.questions;
-        return SURVEY_DATA.package.questions;
+    const getQuestionsForType = (_type: string) => {
+        return SURVEY_DATA.questions;
     };
 
     return (

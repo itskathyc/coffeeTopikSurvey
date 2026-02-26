@@ -5,7 +5,6 @@ import { Language, SURVEY_DATA, UI_STRINGS } from '../data/surveyData';
 const SurveyPage = () => {
     const navigate = useNavigate();
     const [lang, setLang] = useState<Language>('en');
-    const [setType, setSetType] = useState<'market' | 'package'>('market');
     const [currentStep, setCurrentStep] = useState(0);
     const [uid, setUid] = useState<string>('');
     const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -14,16 +13,12 @@ const SurveyPage = () => {
         const savedLang = localStorage.getItem('surveyLanguage') as Language;
         if (savedLang) setLang(savedLang);
 
-        // 50:50 random assignment
-        const randomSet = Math.random() < 0.5 ? 'market' : 'package';
-        setSetType(randomSet);
-
         // Generate UID
         const newUid = Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
         setUid(newUid);
     }, []);
 
-    const surveySet = SURVEY_DATA[setType];
+    const surveySet = SURVEY_DATA;
     const totalSteps = surveySet.questions.length;
     const currentQuestion = surveySet.questions[currentStep];
 
@@ -62,7 +57,7 @@ const SurveyPage = () => {
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
         formData.append('uid', uid);
-        formData.append('type', setType === 'market' ? '[시장검증]' : '[패키지]');
+        formData.append('type', '[설문]');
         formData.append('language', getLangCode(lang));
 
         Object.keys(koreanAnswers).forEach(key => {
@@ -91,7 +86,7 @@ const SurveyPage = () => {
             // Save results to local storage to be used in Thank You page
             localStorage.setItem('surveyResults', JSON.stringify({
                 uid,
-                type: setType === 'market' ? '[시장검증]' : '[패키지]',
+                type: '[설문]',
                 language: getLangCode(lang),
                 ...koreanAnswers
             }));
