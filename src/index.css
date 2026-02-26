@@ -205,6 +205,21 @@ body {
   height: auto;
 }
 
+.question-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.question-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

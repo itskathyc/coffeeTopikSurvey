@@ -120,6 +120,16 @@ const SurveyPage = () => {
                 <img src="/logo.png" alt="CoffeeTopik Logo" className="survey-logo" />
             </div>
 
+            {(currentQuestion.id === 'q5' || currentQuestion.id === 'q7' || currentQuestion.id === 'q8') && (
+                <div className="question-image-container">
+                    <img
+                        src={`/dist/survey_0${currentQuestion.id.slice(1)}.png`}
+                        alt={`Question ${currentQuestion.id}`}
+                        className="question-image"
+                    />
+                </div>
+            )}
+
             <div className="question-card">
                 <h2 className="question-text">{currentQuestion.text[lang]}</h2>
                 <div className="options">

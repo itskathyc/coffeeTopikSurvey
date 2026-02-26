@@ -51,6 +51,7 @@ typings/
 
 # Build outputs
 dist/
+!public/dist/
 dist-ssr/
 *.local
 
