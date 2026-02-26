@@ -1,5 +1,4 @@
 require('dotenv').config();
-const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
     // Simple check for Netlify Identity (optional but recommended)
