@@ -4,6 +4,7 @@ import { Language, UI_STRINGS } from '../data/surveyData';
 const ThankYouPage = () => {
     const [lang, setLang] = useState<Language>('en');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [instaId, setInstaId] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
     useEffect(() => {
@@ -13,13 +14,17 @@ const ThankYouPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!phoneNumber) return;
+        if (!phoneNumber && !instaId) {
+            alert("Please provide either a phone number or an Instagram ID.");
+            return;
+        }
 
         const results = JSON.parse(localStorage.getItem('surveyResults') || '{}');
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
         formData.append('uid', results.uid);
         formData.append('phoneNumber', phoneNumber);
+        formData.append('instaId', instaId);
 
         // Add survey meta data
         formData.append('type', results.type);
@@ -49,33 +54,73 @@ const ThankYouPage = () => {
 
     return (
         <div className="thank-you-view">
-            <h1 className="question-text">{UI_STRINGS[lang].thankYou}</h1>
+            <h1 className="question-text" style={{ marginBottom: '10px' }}>{UI_STRINGS[lang].thankYou}</h1>
 
             {!submitted ? (
-                <>
-                    <p style={{ fontSize: '16px', color: '#555' }}>
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ width: '100%', marginBottom: '20px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <img
+                            src="/dist/oliveyoung.jpg"
+                            alt="Olive Young Event"
+                            style={{ width: '100%', display: 'block' }}
+                        />
+                    </div>
+
+                    <p style={{
+                        fontSize: '15px',
+                        color: '#444',
+                        lineHeight: '1.6',
+                        textAlign: 'center',
+                        marginBottom: '25px',
+                        whiteSpace: 'pre-wrap',
+                        fontWeight: '500'
+                    }}>
                         {UI_STRINGS[lang].phoneRequest}
                     </p>
-                    <form onSubmit={handleSubmit}>
+
+                    <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <input
                             type="tel"
                             className="phone-input"
                             placeholder={UI_STRINGS[lang].phonePlaceholder}
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
-                            required
+                            style={{ marginBottom: '0' }}
                         />
-                        <button type="submit" className="fixed-bottom-btn">
+                        <input
+                            type="text"
+                            className="phone-input"
+                            placeholder={UI_STRINGS[lang].instaPlaceholder}
+                            value={instaId}
+                            onChange={(e) => setInstaId(e.target.value)}
+                        />
+                        <button type="submit" className="fixed-bottom-btn" style={{ position: 'static', marginTop: '10px' }}>
                             {UI_STRINGS[lang].submit}
                         </button>
                     </form>
-                </>
+                </div>
             ) : (
-                <div style={{ marginTop: '40px' }}>
-                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--primary-dark)' }}>
-                        ✓ 제출 완료되었습니다.
+                <div style={{ marginTop: '40px', textAlign: 'center' }}>
+                    <div style={{
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '50%',
+                        backgroundColor: '#e8f5e9',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 20px',
+                        color: '#2e7d32',
+                        fontSize: '30px'
+                    }}>
+                        ✓
+                    </div>
+                    <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#333' }}>
+                        {lang === 'ko' ? '제출 완료되었습니다.' : 'Submission Complete.'}
                     </p>
-                    <p style={{ marginTop: '10px', color: '#666' }}>감사합니다!</p>
+                    <p style={{ marginTop: '10px', color: '#666' }}>
+                        {lang === 'ko' ? '참여해주셔서 감사합니다!' : 'Thank you for your participation!'}
+                    </p>
                 </div>
             )}
         </div>
