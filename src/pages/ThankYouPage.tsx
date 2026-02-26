@@ -78,7 +78,7 @@ const ThankYouPage = () => {
                         {UI_STRINGS[lang].phoneRequest}
                     </p>
 
-                    <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                         <input
                             type="tel"
                             className="phone-input"
@@ -87,6 +87,7 @@ const ThankYouPage = () => {
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             style={{ marginBottom: '0' }}
                         />
+                        <div style={{ color: '#888', fontSize: '14px', fontWeight: 'bold' }}>OR</div>
                         <input
                             type="text"
                             className="phone-input"
@@ -94,7 +95,7 @@ const ThankYouPage = () => {
                             value={instaId}
                             onChange={(e) => setInstaId(e.target.value)}
                         />
-                        <button type="submit" className="fixed-bottom-btn" style={{ position: 'static', marginTop: '10px' }}>
+                        <button type="submit" className="fixed-bottom-btn" style={{ position: 'static', width: '100%', marginTop: '10px', transform: 'none', left: 'auto' }}>
                             {UI_STRINGS[lang].submit}
                         </button>
                     </form>
