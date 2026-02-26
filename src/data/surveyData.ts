@@ -4,6 +4,8 @@ export interface Question {
     id: string;
     text: Record<Language, string>;
     options: Record<Language, string[]>;
+    multiple?: boolean;
+    max?: number;
 }
 
 export interface SurveySet {
@@ -109,6 +111,8 @@ export const SURVEY_DATA: SurveySet = {
         },
         {
             id: 'q6',
+            multiple: true,
+            max: 2,
             text: {
                 ko: '현재 TOPIK 모의고사나 기출문제를 풀면서 가장 답답하거나 부족하다고 느끼는 점은 무엇입니까? (최대 2개 선택)',
                 en: 'When solving TOPIK mock tests or past papers, what feels most frustrating or insufficient? (Select up to 2)',

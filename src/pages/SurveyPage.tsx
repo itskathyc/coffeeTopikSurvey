@@ -7,7 +7,7 @@ const SurveyPage = () => {
     const [lang, setLang] = useState<Language>('en');
     const [currentStep, setCurrentStep] = useState(0);
     const [uid, setUid] = useState<string>('');
-    const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
 
     useEffect(() => {
         const savedLang = localStorage.getItem('surveyLanguage') as Language;
@@ -33,16 +33,25 @@ const SurveyPage = () => {
         return mapping[l] || l.toUpperCase();
     };
 
-    const convertKorean = (rawAnswers: Record<string, string>) => {
+    const convertKorean = (rawAnswers: Record<string, string | string[]>) => {
         const converted: Record<string, string> = {};
         Object.keys(rawAnswers).forEach(qId => {
             const question = surveySet.questions.find(q => q.id === qId);
             if (question) {
-                const optionIndex = question.options[lang].indexOf(rawAnswers[qId]);
-                if (optionIndex !== -1) {
-                    converted[qId] = question.options.ko[optionIndex];
+                const answerValue = rawAnswers[qId];
+                if (Array.isArray(answerValue)) {
+                    const translatedAnswers = answerValue.map(val => {
+                        const optionIndex = question.options[lang].indexOf(val);
+                        return optionIndex !== -1 ? question.options.ko[optionIndex] : val;
+                    });
+                    converted[qId] = translatedAnswers.join(', ');
                 } else {
-                    converted[qId] = rawAnswers[qId];
+                    const optionIndex = question.options[lang].indexOf(answerValue);
+                    if (optionIndex !== -1) {
+                        converted[qId] = question.options.ko[optionIndex];
+                    } else {
+                        converted[qId] = answerValue;
+                    }
                 }
             }
         });
@@ -52,7 +61,7 @@ const SurveyPage = () => {
         return converted;
     };
 
-    const submitResults = async (finalAnswers: Record<string, string>) => {
+    const submitResults = async (finalAnswers: Record<string, string | string[]>) => {
         const koreanAnswers = convertKorean(finalAnswers);
         const formData = new FormData();
         formData.append('form-name', 'survey-results');
@@ -95,7 +104,25 @@ const SurveyPage = () => {
     };
 
     const handleOptionSelect = (option: string) => {
-        setAnswers({ ...answers, [currentQuestion.id]: option });
+        if (currentQuestion.multiple) {
+            const currentAnswers = (answers[currentQuestion.id] as string[]) || [];
+            if (currentAnswers.includes(option)) {
+                setAnswers({
+                    ...answers,
+                    [currentQuestion.id]: currentAnswers.filter(a => a !== option)
+                });
+            } else {
+                if (currentQuestion.max && currentAnswers.length >= currentQuestion.max) {
+                    return; // Max reached
+                }
+                setAnswers({
+                    ...answers,
+                    [currentQuestion.id]: [...currentAnswers, option]
+                });
+            }
+        } else {
+            setAnswers({ ...answers, [currentQuestion.id]: option });
+        }
     };
 
     const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -131,7 +158,10 @@ const SurveyPage = () => {
                     {currentQuestion.options[lang].map((option, idx) => (
                         <button
                             key={idx}
-                            className={`option-btn ${answers[currentQuestion.id] === option ? 'selected' : ''}`}
+                            className={`option-btn ${currentQuestion.multiple
+                                    ? ((answers[currentQuestion.id] as string[]) || []).includes(option) ? 'selected' : ''
+                                    : answers[currentQuestion.id] === option ? 'selected' : ''
+                                }`}
                             onClick={() => handleOptionSelect(option)}
                         >
                             {option}
@@ -143,8 +173,16 @@ const SurveyPage = () => {
             <button
                 className="fixed-bottom-btn"
                 onClick={handleNext}
-                disabled={!answers[currentQuestion.id]}
-                style={{ opacity: answers[currentQuestion.id] ? 1 : 0.5 }}
+                disabled={
+                    currentQuestion.multiple
+                        ? !((answers[currentQuestion.id] as string[]) || []).length
+                        : !answers[currentQuestion.id]
+                }
+                style={{
+                    opacity: (currentQuestion.multiple
+                        ? ((answers[currentQuestion.id] as string[]) || []).length
+                        : answers[currentQuestion.id]) ? 1 : 0.5
+                }}
             >
                 {UI_STRINGS[lang].next}
             </button>
